@@ -1,0 +1,38 @@
+groups:
+  - name: aegis
+    rules:
+      - alert: AegisCriticalVulnerability
+        expr: aegis_vulnerabilities{severity="CRITICAL"} > 0
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical CVEs in {{ $labels.image }}"
+          description: "{{ $value }} critical vulnerabilities are open in {{ $labels.image }}."
+
+      - alert: AegisGateFailing
+        expr: aegis_policy_pass == 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.image }} fails the vulnerability gate"
+
+      - alert: AegisScanStale
+        # Nothing has re-scanned this image in 48h — the CVE database has moved on.
+        expr: (time() - aegis_scan_timestamp_seconds) > 172800
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: "No fresh scan for {{ $labels.image }}"
+          description: "Last scan was {{ $value | humanizeDuration }} ago."
+
+      - alert: AegisExceptionsExpiring
+        expr: aegis_exceptions_expiring_soon > 0
+        for: 6h
+        labels:
+          severity: info
+        annotations:
+          summary: "{{ $value }} vulnerability exception(s) expire soon"
+          description: "Review them before they lapse and start failing builds."

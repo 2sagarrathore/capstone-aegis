@@ -1,0 +1,13 @@
+.venv/
+.git/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+reports/
+aegis.db*
+tests/
+docs/
+deploy/
+ci/
+.github/

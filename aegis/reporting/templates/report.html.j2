@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis scan — {{ result.image }}</title>
+<style>
+  :root {
+    --bg:#f9f9f7; --surface:#fcfcfb; --border:rgba(11,11,11,.10); --text:#0b0b0b; --muted:#898781;
+    --critical:#851616; --high:#b82e2e; --medium:#d66565; --low:#e79b9b; --unknown:#898781;
+    --pass:#006300; --fail:#d03b3b; --accent:#2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0d0d0d; --surface:#1a1a19; --border:rgba(255,255,255,.10); --text:#f0efec; --muted:#898781;
+      --critical:#b92f2f; --high:#dd5252; --medium:#ee8c8c; --low:#f7c0c0; --unknown:#898781;
+      --pass:#0ca30c; --fail:#e66767; --accent:#3987e5;
+    }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:24px 16px 64px; background:var(--bg); color:var(--text);
+         font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  .wrap { max-width:1100px; margin:0 auto; }
+  h1 { font-size:22px; margin:0 0 4px; letter-spacing:-0.01em; }
+  h2 { font-size:16px; margin:32px 0 12px; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:20px; word-break:break-all; }
+  .verdict { display:inline-block; padding:6px 14px; border-radius:999px; font-weight:600;
+             font-size:13px; letter-spacing:.04em; color:#fff; }
+  .verdict.PASS { background:var(--pass); }
+  .verdict.FAIL { background:var(--fail); }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin:18px 0; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .card .n { font-size:26px; font-weight:650; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .card .l { font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-top:4px; }
+  .card.critical .n { color:var(--critical); } .card.high .n { color:var(--high); }
+  .card.medium .n { color:var(--medium); } .card.low .n { color:var(--low); }
+  .panel { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .panel ul { margin:8px 0 0; padding-left:20px; } .panel li { margin:3px 0; }
+  .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px; }
+  table { width:100%; min-width:640px; border-collapse:collapse; background:var(--surface);
+          border:1px solid var(--border); border-radius:10px; overflow:hidden; font-size:13.5px; }
+  th { text-align:left; padding:9px 12px; background:var(--bg); border-bottom:1px solid var(--border);
+       font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr:last-child td { border-bottom:none; }
+  .sev { font-weight:650; font-size:11.5px; letter-spacing:.04em; white-space:nowrap; }
+  .sev.CRITICAL{color:var(--critical);} .sev.HIGH{color:var(--high);}
+  .sev.MEDIUM{color:var(--medium);} .sev.LOW{color:var(--low);} .sev.UNKNOWN{color:var(--unknown);}
+  a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; }
+  td code, td a code { white-space:nowrap; }
+  .fix { color:var(--pass); } .nofix { color:var(--muted); font-style:italic; }
+  .controls { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0; }
+  .controls input, .controls select { padding:7px 10px; border:1px solid var(--border);
+       border-radius:7px; background:var(--surface); color:var(--text); font-size:13px; }
+  .controls input { flex:1; min-width:180px; }
+  .meta { color:var(--muted); font-size:12px; margin-top:28px; border-top:1px solid var(--border); padding-top:12px; }
+  .meta dl { display:grid; grid-template-columns:auto 1fr; gap:3px 14px; margin:0; }
+  .meta dt { color:var(--muted); } .meta dd { margin:0; word-break:break-all; }
+  .delta-up { color:var(--fail); font-weight:600; } .delta-down { color:var(--pass); font-weight:600; }
+  @media (max-width:860px){ td,th{padding:7px 8px;} .hide-sm{display:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Aegis vulnerability report</h1>
+  <div class="sub"><code>{{ result.image }}</code>{% if result.image_digest %} · <code>{{ result.image_digest }}</code>{% endif %}</div>
+  <span class="verdict {{ decision.verdict }}">{{ decision.verdict }}</span>
+  <span class="sub" style="margin-left:10px">policy: {{ policy_description }}</span>
+
+  <div class="cards">
+    <div class="card critical"><div class="n">{{ counts.CRITICAL }}</div><div class="l">Critical</div></div>
+    <div class="card high"><div class="n">{{ counts.HIGH }}</div><div class="l">High</div></div>
+    <div class="card medium"><div class="n">{{ counts.MEDIUM }}</div><div class="l">Medium</div></div>
+    <div class="card low"><div class="n">{{ counts.LOW }}</div><div class="l">Low</div></div>
+    <div class="card"><div class="n">{{ result.fixable_count() }}</div><div class="l">Fixable</div></div>
+    <div class="card"><div class="n">{{ result.suppressed|length }}</div><div class="l">Suppressed</div></div>
+  </div>
+
+  {% if decision.reasons %}
+  <div class="panel">
+    <strong>Why this verdict</strong>
+    <ul>{% for reason in decision.reasons %}<li>{{ reason }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  {% if diff %}
+  <h2>Change since previous scan</h2>
+  <div class="panel">
+    <span class="delta-up">+{{ diff.introduced|length }} introduced</span> ·
+    <span class="delta-down">−{{ diff.resolved|length }} resolved</span> ·
+    {{ diff.unchanged_count }} unchanged
+    {% if diff.introduced %}
+    <ul>{% for v in diff.introduced[:10] %}
+      <li><span class="sev {{ v.severity.value }}">{{ v.severity.value }}</span>
+          <code>{{ v.vuln_id }}</code> in <code>{{ v.package }}</code></li>
+    {% endfor %}
+    {% if diff.introduced|length > 10 %}<li>…and {{ diff.introduced|length - 10 }} more</li>{% endif %}</ul>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <h2>Findings ({{ rows|length }}{% if truncated %} of {{ result.total }} shown{% endif %})</h2>
+  <div class="controls">
+    <input id="q" type="search" placeholder="Filter by CVE, package or title…" aria-label="Filter findings">
+    <select id="sev" aria-label="Filter by severity">
+      <option value="">All severities</option>
+      <option value="CRITICAL">Critical</option><option value="HIGH">High</option>
+      <option value="MEDIUM">Medium</option><option value="LOW">Low</option>
+    </select>
+    <select id="fix" aria-label="Filter by fix availability">
+      <option value="">Fixable and not</option><option value="yes">Fixable only</option>
+      <option value="no">No fix available</option>
+    </select>
+  </div>
+  <div class="table-wrap"><table id="findings">
+    <thead><tr>
+      <th>Severity</th><th>CVE</th><th>Package</th><th>Installed</th>
+      <th>Fixed in</th><th class="hide-sm">CVSS</th><th class="hide-sm">Title</th>
+    </tr></thead>
+    <tbody>
+    {% for v in rows %}
+      <tr data-sev="{{ v.severity.value }}" data-fix="{{ 'yes' if v.fixed_version else 'no' }}">
+        <td><span class="sev {{ v.severity.value }}">{{ v.severity.value }}</span></td>
+        <td>{% if v.primary_url %}<a href="{{ v.primary_url }}" rel="noopener noreferrer" target="_blank"><code>{{ v.vuln_id }}</code></a>{% else %}<code>{{ v.vuln_id }}</code>{% endif %}</td>
+        <td><code>{{ v.package }}</code></td>
+        <td><code>{{ v.installed_version }}</code></td>
+        <td>{% if v.fixed_version %}<code class="fix">{{ v.fixed_version }}</code>{% else %}<span class="nofix">none</span>{% endif %}</td>
+        <td class="hide-sm">{{ '%.1f'|format(v.cvss_score) if v.cvss_score else '—' }}</td>
+        <td class="hide-sm">{{ v.title }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7">No findings at the configured severity levels. 🎉</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+
+  {% if result.suppressed and include_suppressed %}
+  <h2>Suppressed by exception ({{ result.suppressed|length }})</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Severity</th><th>CVE</th><th>Package</th><th>Installed</th></tr></thead>
+    <tbody>
+    {% for v in result.suppressed %}
+      <tr><td><span class="sev {{ v.severity.value }}">{{ v.severity.value }}</span></td>
+          <td><code>{{ v.vuln_id }}</code></td><td><code>{{ v.package }}</code></td>
+          <td><code>{{ v.installed_version }}</code></td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% endif %}
+
+  <div class="meta">
+    <dl>
+      <dt>Scan ID</dt><dd><code>{{ result.scan_id }}</code></dd>
+      <dt>Scanned at</dt><dd>{{ result.scanned_at }}</dd>
+      <dt>Engine</dt><dd>{{ result.scanner }} {{ result.scanner_version }}</dd>
+      <dt>Base OS</dt><dd>{{ result.os_family }} {{ result.os_version }}</dd>
+      <dt>Image size</dt><dd>{{ image_size }}</dd>
+      <dt>Duration</dt><dd>{{ '%.1f'|format(result.duration_seconds) }}s</dd>
+    </dl>
+  </div>
+</div>
+<script>
+  (function () {
+    var q = document.getElementById('q'), sev = document.getElementById('sev'),
+        fix = document.getElementById('fix'),
+        rows = Array.prototype.slice.call(document.querySelectorAll('#findings tbody tr'));
+    function apply() {
+      var term = q.value.toLowerCase(), s = sev.value, f = fix.value;
+      rows.forEach(function (row) {
+        var matches = (!term || row.textContent.toLowerCase().indexOf(term) !== -1)
+          && (!s || row.getAttribute('data-sev') === s)
+          && (!f || row.getAttribute('data-fix') === f);
+        row.style.display = matches ? '' : 'none';
+      });
+    }
+    [q, sev, fix].forEach(function (el) { el && el.addEventListener('input', apply); });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Aegis{% endblock %}</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:#f9f9f7; --surface:#fcfcfb; --border:rgba(11,11,11,.10);
+    --text:#0b0b0b; --secondary:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --accent:#2a78d6;
+    --sev-critical:#851616; --sev-high:#b82e2e; --sev-medium:#d66565; --sev-low:#e79b9b;
+    --pass:#006300; --fail:#d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page:#0d0d0d; --surface:#1a1a19; --border:rgba(255,255,255,.10);
+      --text:#f0efec; --secondary:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --accent:#3987e5;
+      --sev-critical:#b92f2f; --sev-high:#dd5252; --sev-medium:#ee8c8c; --sev-low:#f7c0c0;
+      --pass:#0ca30c; --fail:#e66767;
+    }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--page); color:var(--text);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px; }
+  td code, td a code { white-space:nowrap; }
+  header { background:var(--surface); border-bottom:1px solid var(--border); padding:14px 20px; }
+  header .inner { max-width:1180px; margin:0 auto; display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+  header h1 { font-size:17px; margin:0; letter-spacing:-.01em; }
+  header nav { margin-left:auto; display:flex; gap:16px; font-size:13.5px; }
+  main { max-width:1180px; margin:0 auto; padding:22px 20px 70px; }
+  h2 { font-size:15px; margin:30px 0 12px; letter-spacing:-.005em; }
+  h2:first-of-type { margin-top:18px; }
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:10px; }
+  .tile { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:13px 15px; }
+  .tile .n { font-size:27px; font-weight:650; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .tile .l { font-size:11px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+  .tile.critical .n { color:var(--sev-critical); } .tile.high .n { color:var(--sev-high); }
+  .tile.fail .n { color:var(--fail); } .tile.ok .n { color:var(--pass); }
+  .panel { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+  .chart { width:100%; height:auto; display:block; }
+  .chart .seg { transition:opacity .12s; } .chart .seg:hover, .chart .seg:focus { opacity:.78; outline:none; }
+  .chart .tick, .chart .rowlabel, .chart .rowvalue { font-size:11px; fill:var(--muted);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .chart .rowlabel { fill:var(--secondary); } .chart .rowvalue { fill:var(--muted); font-variant-numeric:tabular-nums; }
+  .chart-empty { display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; }
+  .legend { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--secondary); margin-top:10px; }
+  .legend-item { display:inline-flex; align-items:center; gap:6px; }
+  .swatch { width:10px; height:10px; border-radius:3px; display:inline-block; }
+  .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; border-radius:10px; }
+  table { width:100%; min-width:640px; border-collapse:collapse; background:var(--surface);
+    border:1px solid var(--border); border-radius:10px; overflow:hidden; font-size:13.5px; }
+  th { text-align:left; padding:9px 12px; background:var(--page); border-bottom:1px solid var(--border);
+    font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+  td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .sev { font-weight:650; font-size:11.5px; letter-spacing:.03em; white-space:nowrap; }
+  .sev.CRITICAL{color:var(--sev-critical);} .sev.HIGH{color:var(--sev-high);}
+  .sev.MEDIUM{color:var(--sev-medium);} .sev.LOW{color:var(--sev-low);} .sev.UNKNOWN{color:var(--muted);}
+  .pill { display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px;
+    font-weight:650; letter-spacing:.04em; color:#fff; }
+  .pill.PASS { background:var(--pass); } .pill.FAIL { background:var(--fail); }
+  .filters { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:0 0 12px; }
+  .filters input, .filters select { padding:7px 10px; border:1px solid var(--border); border-radius:7px;
+    background:var(--surface); color:var(--text); font-size:13px; }
+  .filters input[type=search] { min-width:220px; }
+  .muted { color:var(--muted); font-size:12.5px; }
+  .spark-empty { color:var(--muted); }
+  .spark { width:110px; height:26px; }
+  #tip { position:fixed; pointer-events:none; opacity:0; transition:opacity .1s;
+    background:var(--text); color:var(--page); padding:5px 9px; border-radius:6px;
+    font-size:12px; z-index:50; white-space:nowrap; }
+  @media (max-width:860px){ .hide-sm { display:none; } td,th { padding:7px 8px; } }
+</style>
+</head>
+<body>
+<header><div class="inner">
+  <h1><a href="{{ url_for('overview') }}" style="color:inherit">Aegis</a></h1>
+  <span class="muted">container image vulnerability dashboard</span>
+  <nav>
+    <a href="{{ url_for('overview') }}">Overview</a>
+    <a href="{{ url_for('scans_page') }}">Scan history</a>
+    <a href="{{ url_for('exceptions_page') }}">Exceptions</a>
+    <a href="{{ url_for('metrics') }}">Metrics</a>
+  </nav>
+</div></header>
+<main>{% block body %}{% endblock %}</main>
+<div id="tip" role="tooltip"></div>
+<script>
+  (function () {
+    var tip = document.getElementById('tip');
+    function show(e) {
+      var text = e.target.getAttribute && e.target.getAttribute('data-tip');
+      if (!text) return;
+      tip.textContent = text; tip.style.opacity = '1';
+      var x = (e.clientX || 0) + 12, y = (e.clientY || 0) - 30;
+      tip.style.left = Math.min(x, window.innerWidth - tip.offsetWidth - 10) + 'px';
+      tip.style.top = Math.max(y, 6) + 'px';
+    }
+    function hide() { tip.style.opacity = '0'; }
+    document.addEventListener('mousemove', function (e) {
+      if (e.target.classList && e.target.classList.contains('seg')) show(e); else hide();
+    });
+    document.addEventListener('focusin', function (e) {
+      if (e.target.classList && e.target.classList.contains('seg')) {
+        var box = e.target.getBoundingClientRect();
+        show({ target: e.target, clientX: box.left + box.width / 2, clientY: box.top });
+      }
+    });
+    document.addEventListener('focusout', hide);
+
+    var filterInputs = document.querySelectorAll('[data-filter-target]');
+    filterInputs.forEach(function (input) {
+      input.addEventListener('input', function () {
+        var table = document.querySelector(input.getAttribute('data-filter-target'));
+        if (!table) return;
+        var controls = document.querySelectorAll('[data-filter-target="' + input.getAttribute('data-filter-target') + '"]');
+        Array.prototype.forEach.call(table.querySelectorAll('tbody tr'), function (row) {
+          var ok = true;
+          Array.prototype.forEach.call(controls, function (control) {
+            var value = control.value.trim().toLowerCase();
+            if (!value) return;
+            var key = control.getAttribute('data-filter-key');
+            if (key === 'text') { ok = ok && row.textContent.toLowerCase().indexOf(value) !== -1; }
+            else { ok = ok && (row.getAttribute('data-' + key) || '').toLowerCase() === value; }
+          });
+          row.style.display = ok ? '' : 'none';
+        });
+      });
+    });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Aegis — {{ image }}{% endblock %}
+{% block body %}
+<h2 style="margin-top:4px"><code>{{ image }}</code>
+  {% if latest %}<span class="pill {{ latest.verdict or 'PASS' }}">{{ latest.verdict or '—' }}</span>{% endif %}
+</h2>
+{% if not latest %}
+  <p class="muted">No scans recorded for this image.</p>
+{% else %}
+<div class="tiles">
+  <div class="tile critical"><div class="n">{{ latest.critical }}</div><div class="l">Critical</div></div>
+  <div class="tile high"><div class="n">{{ latest.high }}</div><div class="l">High</div></div>
+  <div class="tile"><div class="n">{{ latest.medium }}</div><div class="l">Medium</div></div>
+  <div class="tile"><div class="n">{{ latest.low }}</div><div class="l">Low</div></div>
+  <div class="tile"><div class="n">{{ latest.fixable }}</div><div class="l">Fixable</div></div>
+  <div class="tile"><div class="n">{{ latest.suppressed }}</div><div class="l">Suppressed</div></div>
+</div>
+<p class="muted" style="margin-top:12px">
+  {{ latest.os_family }} {{ latest.os_version }} · {{ image_size }} ·
+  scanned {{ latest.scanned_at.replace('T', ' ') }} by {{ latest.scanner }} {{ latest.scanner_version }}
+  · source <code>{{ latest.source }}</code> · scan <code>{{ latest.scan_id }}</code>
+</p>
+{% if reasons %}
+<div class="panel" style="margin-top:12px"><strong>Gate reasons</strong>
+  <ul style="margin:6px 0 0 18px">{% for reason in reasons %}<li>{{ reason }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<h2>History <span class="muted">· last {{ days }} days</span></h2>
+<div class="panel">{{ trend_chart|safe }}{{ legend|safe }}</div>
+
+<h2>Findings <span class="muted">· {{ findings|length }} in the latest scan</span></h2>
+<div class="filters">
+  <input type="search" placeholder="Filter by CVE, package…" data-filter-target="#findings" data-filter-key="text" aria-label="Filter findings">
+  <select data-filter-target="#findings" data-filter-key="sev" aria-label="Filter by severity">
+    <option value="">Any severity</option>
+    <option value="critical">Critical</option><option value="high">High</option>
+    <option value="medium">Medium</option><option value="low">Low</option>
+  </select>
+  <select data-filter-target="#findings" data-filter-key="fix" aria-label="Filter by fix availability">
+    <option value="">Fixable and not</option><option value="yes">Fixable</option><option value="no">No fix</option>
+  </select>
+  <a class="muted" href="{{ url_for('api_findings', scan_id=latest.scan_id) }}">JSON</a>
+</div>
+<div class="table-wrap"><table id="findings">
+  <thead><tr><th>Severity</th><th>CVE</th><th>Package</th><th>Installed</th>
+    <th>Fixed in</th><th class="num hide-sm">CVSS</th><th class="hide-sm">Title</th></tr></thead>
+  <tbody>
+  {% for f in findings %}
+    <tr data-sev="{{ f.severity|lower }}" data-fix="{{ 'yes' if f.fixed_version else 'no' }}">
+      <td><span class="sev {{ f.severity }}">{{ f.severity }}</span></td>
+      <td>{% if f.primary_url %}<a href="{{ f.primary_url }}" target="_blank" rel="noopener noreferrer"><code>{{ f.vuln_id }}</code></a>{% else %}<code>{{ f.vuln_id }}</code>{% endif %}</td>
+      <td><code>{{ f.package }}</code></td>
+      <td><code>{{ f.installed_version }}</code></td>
+      <td>{% if f.fixed_version %}<code>{{ f.fixed_version }}</code>{% else %}<span class="muted">none</span>{% endif %}</td>
+      <td class="num hide-sm">{{ '%.1f'|format(f.cvss_score) if f.cvss_score else '—' }}</td>
+      <td class="hide-sm muted">{{ (f.title or '')[:90] }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" class="muted">No active findings. 🎉</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endif %}
+{% endblock %}

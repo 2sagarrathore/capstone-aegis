@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Aegis — scan history{% endblock %}
+{% block body %}
+<h2 style="margin-top:4px">Scan history</h2>
+<form class="filters" method="get">
+  <input type="search" name="image" value="{{ request.args.get('image','') }}" placeholder="Image filter (glob *)" aria-label="Image filter">
+  <select name="days" aria-label="Time range">
+    {% for option in [7, 30, 90, 365] %}
+      <option value="{{ option }}" {% if days == option %}selected{% endif %}>Last {{ option }} days</option>
+    {% endfor %}
+  </select>
+  <select name="verdict" aria-label="Verdict">
+    <option value="">Any verdict</option>
+    <option value="PASS" {% if request.args.get('verdict') == 'PASS' %}selected{% endif %}>Pass</option>
+    <option value="FAIL" {% if request.args.get('verdict') == 'FAIL' %}selected{% endif %}>Fail</option>
+  </select>
+  <button type="submit" style="padding:7px 14px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px">Apply</button>
+  <span class="muted">{{ rows|length }} scan(s)</span>
+</form>
+<div class="table-wrap"><table>
+  <thead><tr><th>Scanned at</th><th>Image</th><th>Gate</th><th class="num">Crit</th>
+    <th class="num">High</th><th class="num">Med</th><th class="num">Low</th>
+    <th class="num hide-sm">Suppressed</th><th class="hide-sm">Source</th><th class="num hide-sm">Duration</th></tr></thead>
+  <tbody>
+  {% for row in rows %}
+    <tr>
+      <td class="muted">{{ row.scanned_at[:19].replace('T', ' ') }}</td>
+      <td><a href="{{ url_for('image_page', image=row.image) }}"><code>{{ row.image }}</code></a></td>
+      <td><span class="pill {{ row.verdict or 'PASS' }}">{{ row.verdict or '—' }}</span></td>
+      <td class="num"><span class="sev CRITICAL">{{ row.critical }}</span></td>
+      <td class="num"><span class="sev HIGH">{{ row.high }}</span></td>
+      <td class="num">{{ row.medium }}</td><td class="num">{{ row.low }}</td>
+      <td class="num hide-sm">{{ row.suppressed }}</td>
+      <td class="hide-sm muted">{{ row.source }}</td>
+      <td class="num hide-sm muted">{{ '%.1f'|format(row.duration_seconds or 0) }}s</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="10" class="muted">No scans match these filters.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}

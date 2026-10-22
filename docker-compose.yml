@@ -1,0 +1,72 @@
+# Full local stack: dashboard + Prometheus + Grafana.
+#
+#   docker compose up -d
+#   open http://localhost:8080   (Aegis dashboard)
+#   open http://localhost:3000   (Grafana, admin/admin)
+#
+# Scan an image into the shared database with:
+#   docker compose run --rm scanner scan python:3.12-slim
+
+services:
+  dashboard:
+    build: .
+    image: aegis-scanner:1.0.0
+    container_name: aegis-dashboard
+    command: ["serve", "--host", "0.0.0.0", "--port", "8080"]
+    ports: ["8080:8080"]
+    volumes:
+      - aegis-data:/data
+      - aegis-cache:/cache
+      - ./aegis.yml:/data/aegis.yml:ro
+      - ./exceptions.yml:/data/exceptions.yml:ro
+    restart: unless-stopped
+
+  # One-shot scanner sharing the dashboard's database and CVE cache.
+  scanner:
+    build: .
+    image: aegis-scanner:1.0.0
+    profiles: ["tools"]
+    volumes:
+      - aegis-data:/data
+      - aegis-cache:/cache
+      - ./aegis.yml:/data/aegis.yml:ro
+      - ./exceptions.yml:/data/exceptions.yml:ro
+      # Scanning images from the host daemon needs the socket; drop this if you
+      # only ever scan images pulled straight from a registry.
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: ["aegis"]
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: aegis-prometheus
+    volumes:
+      # The whole directory, not just prometheus.yml: the config references
+      # alerts.yml, and mounting only the former silently loads zero rules.
+      - ./deploy/prometheus:/etc/prometheus:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=90d
+    ports: ["9090:9090"]
+    depends_on: [dashboard]
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.5.1
+    container_name: aegis-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports: ["3000:3000"]
+    depends_on: [prometheus]
+    restart: unless-stopped
+
+volumes:
+  aegis-data:
+  aegis-cache:
+  prometheus-data:
+  grafana-data:

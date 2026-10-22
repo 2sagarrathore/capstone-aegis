@@ -1,0 +1,62 @@
+# Aegis configuration. Every value here can be overridden by an AEGIS_* environment
+# variable (see docs/USAGE.md) so CI pipelines can tune a run without editing the file.
+
+scanner:
+  engine: trivy
+  timeout_seconds: 600
+  retries: 2                  # transient registry/DB failures are retried with backoff
+  retry_backoff_seconds: 5
+  severities: [LOW, MEDIUM, HIGH, CRITICAL]
+  ignore_unfixed: false       # true = only report CVEs that have an upstream fix
+  scanners: [vuln]
+  cache_dir: ""               # set in CI and cache this path between runs (see COST_OPTIMIZATION.md)
+  offline: false
+  skip_db_update: false
+
+policy:
+  # Any finding at or above `fail_on` fails the build, unless a per-severity
+  # budget below overrides it for that severity.
+  fail_on: HIGH
+  max_allowed:
+    CRITICAL: 0
+    HIGH: 10
+  fail_on_fixable_only: false # true = ignore CVEs nobody has shipped a fix for yet
+  warn_only: false            # true = report breaches but always exit 0 (rollout mode)
+
+exceptions:
+  file: exceptions.yml
+  default_expiry_days: 90
+  warn_on_expiring_within_days: 14
+
+reporting:
+  output_dir: reports
+  formats: [json, html, markdown]
+  max_rows_in_html: 500
+  include_suppressed: true
+
+notifications:
+  slack:
+    enabled: false            # set AEGIS_SLACK_ENABLED=true and export SLACK_WEBHOOK_URL
+    webhook_url_env: SLACK_WEBHOOK_URL
+    min_severity: HIGH        # new findings at/above this severity trigger a message
+    notify_on_pass: false
+    dashboard_url: ""
+  teams:
+    enabled: false
+    webhook_url_env: TEAMS_WEBHOOK_URL
+    min_severity: HIGH
+    notify_on_pass: false
+
+storage:
+  database: aegis.db
+  retention_days: 365
+
+metrics:
+  enabled: true
+  textfile_path: reports/aegis_metrics.prom
+  pushgateway_url: ""         # e.g. http://pushgateway:9091
+  job_name: aegis_scanner
+
+rescan:
+  stale_after_hours: 24
+  images: []                  # images a nightly `aegis rescan` should always cover

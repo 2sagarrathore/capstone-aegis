@@ -1,0 +1,114 @@
+# Aegis image scan — build, scan, gate, report, notify.
+#
+# The gate runs *before* the push step, so a failing image is never published.
+name: Image vulnerability scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 3 * * *"   # nightly rescan: the CVE database moves even when the image does not
+  workflow_dispatch:
+    inputs:
+      image:
+        description: Image reference to scan
+        required: false
+
+permissions:
+  contents: read
+  pull-requests: write      # needed only by the PR-comment step
+
+env:
+  IMAGE: ${{ github.event.inputs.image || format('ghcr.io/{0}:{1}', github.repository, github.sha) }}
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Aegis
+        run: pip install -e .
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
+            | sh -s -- -b /usr/local/bin v0.76.1
+
+      # The vulnerability DB is ~700 MB of downloads a day if every job fetches it.
+      # Caching it keeps nightly bandwidth and job minutes down — see docs/COST_OPTIMIZATION.md.
+      - name: Cache vulnerability database
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ github.run_id }}
+          restore-keys: trivy-db-
+
+      - name: Build image
+        if: github.event.inputs.image == ''
+        run: docker build -t "$IMAGE" .
+
+      - name: Scan and gate
+        id: scan
+        env:
+          AEGIS_CACHE_DIR: ~/.cache/trivy
+          AEGIS_FAIL_ON: HIGH
+          AEGIS_MAX_CRITICAL: "0"
+          AEGIS_MAX_HIGH: "10"
+          AEGIS_SLACK_ENABLED: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          set +e
+          aegis scan "$IMAGE" --source github-actions --output-dir reports
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set -e
+
+      - name: Publish report to the job summary
+        if: always()
+        run: cat reports/latest_*.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Comment the report on the pull request
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const file = fs.readdirSync('reports').find(f => f.startsWith('latest_') && f.endsWith('.md'));
+            if (!file) return;
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: fs.readFileSync(`reports/${file}`, 'utf8').slice(0, 65000),
+            });
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aegis-reports
+          path: |
+            reports/*.html
+            reports/*.json
+            reports/*.md
+            reports/*.prom
+          retention-days: 30
+
+      - name: Fail the build if the gate failed
+        if: steps.scan.outputs.exit_code != '0'
+        run: |
+          echo "::error::Aegis gate failed (exit ${{ steps.scan.outputs.exit_code }}) — see the job summary."
+          exit 1
+
+      - name: Push image
+        if: success() && github.ref == 'refs/heads/main' && github.event.inputs.image == ''
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker push "$IMAGE"

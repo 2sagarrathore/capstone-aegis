@@ -1,0 +1,103 @@
+# Approved vulnerability exceptions.
+#
+# Every entry MUST carry an expiry date -- a waiver that never expires is a
+# vulnerability you have decided to forget about. `aegis exceptions prune`
+# removes expired entries; expired entries stop suppressing findings immediately
+# whether or not they have been pruned.
+#
+# `package` and `image` are shell-style globs (default "*" = everything).
+#
+# The entries below are WORKED EXAMPLES from the nginx:1.21 demo scan, including
+# one deliberately expired entry so the lapse behaviour is visible in
+# `aegis exceptions list` and on the dashboard. Replace them with your own.
+
+version: 1
+exceptions:
+- id: CVE-2021-22945
+  package: curl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2021-22945
+  package: libcurl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2022-32207
+  package: curl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2022-32207
+  package: libcurl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2022-32221
+  package: curl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2022-32221
+  package: libcurl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2023-38545
+  package: curl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2023-38545
+  package: libcurl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2023-23914
+  package: curl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2023-23914
+  package: libcurl*
+  image: nginx:*
+  reason: curl is not invoked at runtime in this image
+  approved_by: security@acme.com
+  ticket: SEC-1421
+  created: '2026-10-22'
+  expires: '2026-12-21'
+- id: CVE-2030-0001
+  package: '*'
+  image: '*'
+  reason: expired entry, kept to demonstrate lapse behaviour
+  approved_by: ''
+  ticket: ''
+  created: '2026-10-22'
+  expires: '2026-10-01'

@@ -1,0 +1,67 @@
+# Aegis image scan — GitLab CI template.
+# Include it from your own .gitlab-ci.yml:
+#   include: { project: 'platform/aegis', file: '/ci/gitlab-ci.yml' }
+
+variables:
+  AEGIS_FAIL_ON: "HIGH"
+  AEGIS_MAX_CRITICAL: "0"
+  AEGIS_MAX_HIGH: "10"
+  AEGIS_CACHE_DIR: "$CI_PROJECT_DIR/.cache/trivy"
+  AEGIS_OUTPUT_DIR: "$CI_PROJECT_DIR/reports"
+  IMAGE_REF: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+
+stages: [build, scan, publish]
+
+build-image:
+  stage: build
+  image: docker:27
+  services: [docker:27-dind]
+  script:
+    - docker build -t "$IMAGE_REF" .
+    - docker save "$IMAGE_REF" -o image.tar
+  artifacts:
+    paths: [image.tar]
+    expire_in: 1 day
+
+vulnerability-scan:
+  stage: scan
+  image: python:3.12-slim
+  services: [docker:27-dind]
+  # The CVE database is cached per branch: without this every pipeline re-downloads
+  # several hundred megabytes (see docs/COST_OPTIMIZATION.md).
+  cache:
+    key: "trivy-db-$CI_COMMIT_REF_SLUG"
+    paths: [.cache/trivy]
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq curl docker.io >/dev/null
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.76.1
+    - pip install --quiet -e .
+  script:
+    - docker load -i image.tar
+    - aegis scan "$IMAGE_REF" --source gitlab-ci
+  artifacts:
+    when: always
+    paths: [reports/]
+    expire_in: 30 days
+    reports:
+      # Surfaces findings in the GitLab merge-request security widget.
+      container_scanning: reports/latest_*.json
+  allow_failure: false
+
+nightly-rescan:
+  stage: scan
+  image: python:3.12-slim
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  cache:
+    key: "trivy-db-$CI_COMMIT_REF_SLUG"
+    paths: [.cache/trivy]
+  before_script:
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.76.1
+    - pip install --quiet -e .
+  script:
+    # The image has not changed, but the CVE database has.
+    - aegis rescan --stale-hours 20 || true
+  artifacts:
+    when: always
+    paths: [reports/]

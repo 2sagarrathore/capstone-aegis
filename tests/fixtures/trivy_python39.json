@@ -1,0 +1,405 @@
+{
+ "SchemaVersion": 2,
+ "Trivy": {
+  "Version": "0.76.1"
+ },
+ "ReportID": "01a161e2-4ddd-7979-bf0c-79207bfb5de4",
+ "CreatedAt": "2026-10-22T10:03:03.453623+05:30",
+ "ArtifactID": "sha256:3192d5eee87285f0b633f4781604a8c5eaab67d64e8127368b505b0a57d93e31",
+ "ArtifactName": "python:3.9-slim",
+ "ArtifactType": "container_image",
+ "Metadata": {
+  "OS": {
+   "Family": "debian",
+   "Name": "13.1"
+  },
+  "Size": 151721472,
+  "RepoDigests": [
+   "python@sha256:2d97f6910b16bd338d3060f261f53f144965f755599aab1acda1e13cf1731b1b"
+  ],
+  "ImageID": "sha256:2d97f6910b16bd338d3060f261f53f144965f755599aab1acda1e13cf1731b1b"
+ },
+ "Results": [
+  {
+   "Target": "python:3.9-slim (debian 13.1)",
+   "Class": "os-pkgs",
+   "Type": "debian",
+   "Vulnerabilities": [
+    {
+     "VulnerabilityID": "CVE-2026-31789",
+     "PkgName": "libssl3t64",
+     "InstalledVersion": "3.5.1-1+deb13u1",
+     "FixedVersion": "3.5.5-1~deb13u2",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-31789",
+     "Title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+     "Severity": "CRITICAL",
+     "CVSS": {
+      "julia": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 9.8
+      },
+      "nvd": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 9.8
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:H",
+       "V3Score": 5.8
+      }
+     },
+     "PublishedDate": "2026-04-07T22:16:21.617Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-31789",
+     "PkgName": "openssl",
+     "InstalledVersion": "3.5.1-1+deb13u1",
+     "FixedVersion": "3.5.5-1~deb13u2",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-31789",
+     "Title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+     "Severity": "CRITICAL",
+     "CVSS": {
+      "julia": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 9.8
+      },
+      "nvd": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 9.8
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:H",
+       "V3Score": 5.8
+      }
+     },
+     "PublishedDate": "2026-04-07T22:16:21.617Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-31789",
+     "PkgName": "openssl-provider-legacy",
+     "InstalledVersion": "3.5.1-1+deb13u1",
+     "FixedVersion": "3.5.5-1~deb13u2",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-31789",
+     "Title": "openssl: OpenSSL: Heap buffer overflow on 32-bit systems from large X.509 certificate processing",
+     "Severity": "CRITICAL",
+     "CVSS": {
+      "julia": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 9.8
+      },
+      "nvd": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 9.8
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:H",
+       "V3Score": 5.8
+      }
+     },
+     "PublishedDate": "2026-04-07T22:16:21.617Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-53612",
+     "PkgName": "bsdutils",
+     "InstalledVersion": "1:2.41-5",
+     "FixedVersion": "2.41.5-0+deb13u1",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-53612",
+     "Title": "util-linux: util-linux: TOCTOU in the mount program when applying post-mount ownership/mode changes",
+     "Severity": "HIGH",
+     "CVSS": {
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 7
+      }
+     },
+     "PublishedDate": "2026-10-14T15:17:20.26Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-53613",
+     "PkgName": "bsdutils",
+     "InstalledVersion": "1:2.41-5",
+     "FixedVersion": "2.41.5-0+deb13u1",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-53613",
+     "Title": "util-linux: util-linux: TOCTOU in the mount program via ancestor directory swap on target path",
+     "Severity": "HIGH",
+     "CVSS": {
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 7
+      }
+     },
+     "PublishedDate": "2026-10-14T15:17:20.41Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-53614",
+     "PkgName": "bsdutils",
+     "InstalledVersion": "1:2.41-5",
+     "FixedVersion": "2.41.5-0+deb13u1",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-53614",
+     "Title": "util-linux: util-linux: SUID mount(8) allows nosuid/noexec bypass via LIBMOUNT_FORCE_MOUNT2",
+     "Severity": "HIGH",
+     "CVSS": {
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H",
+       "V3Score": 7
+      }
+     },
+     "PublishedDate": "2026-10-14T16:17:45.93Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-13595",
+     "PkgName": "bsdutils",
+     "InstalledVersion": "1:2.41-5",
+     "FixedVersion": "2.41.5-0+deb13u1",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-13595",
+     "Title": "util-linux: util-linux: heap use-after-free in libblkid nested partition probing",
+     "Severity": "MEDIUM",
+     "CVSS": {
+      "julia": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:N/A:H",
+       "V3Score": 5.3
+      },
+      "nvd": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:L/I:N/A:H",
+       "V3Score": 5.3
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:H",
+       "V3Score": 6.8
+      }
+     },
+     "PublishedDate": "2026-06-29T09:16:28.303Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-27456",
+     "PkgName": "bsdutils",
+     "InstalledVersion": "1:2.41-5",
+     "FixedVersion": "2.41.5-0+deb13u1",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-27456",
+     "Title": "util-linux: TOCTOU in the mount program when setting up loop devices",
+     "Severity": "MEDIUM",
+     "CVSS": {
+      "julia": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:N/A:N",
+       "V3Score": 4.7
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:H/I:N/A:N",
+       "V3Score": 4.7
+      }
+     },
+     "PublishedDate": "2026-04-03T22:16:25.4Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-3184",
+     "PkgName": "bsdutils",
+     "InstalledVersion": "1:2.41-5",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-3184",
+     "Title": "util-linux: util-linux: Access control bypass due to improper hostname canonicalization",
+     "Severity": "MEDIUM",
+     "CVSS": {
+      "nvd": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+       "V3Score": 5.3
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+       "V3Score": 3.7
+      }
+     },
+     "PublishedDate": "2026-04-03T19:17:23.377Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2011-3374",
+     "PkgName": "apt",
+     "InstalledVersion": "3.0.3",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2011-3374",
+     "Title": "It was found that apt-key in apt, all versions, do not correctly valid ...",
+     "Severity": "LOW",
+     "CVSS": {
+      "nvd": {
+       "V2Vector": "AV:N/AC:M/Au:N/C:N/I:P/A:N",
+       "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+       "V2Score": 4.3,
+       "V3Score": 3.7
+      }
+     },
+     "PublishedDate": "2019-11-26T00:15:11.03Z"
+    },
+    {
+     "VulnerabilityID": "TEMP-0841856-B18BAF",
+     "PkgName": "bash",
+     "InstalledVersion": "5.2.37-2+b5",
+     "PrimaryURL": "https://security-tracker.debian.org/tracker/TEMP-0841856-B18BAF",
+     "Title": "[Privilege escalation possible to other user than root]",
+     "Severity": "LOW"
+    },
+    {
+     "VulnerabilityID": "CVE-2022-0563",
+     "PkgName": "bsdutils",
+     "InstalledVersion": "1:2.41-5",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-0563",
+     "Title": "util-linux: partial disclosure of arbitrary files in chfn and chsh when compiled with libreadline",
+     "Severity": "LOW",
+     "CVSS": {
+      "julia": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+       "V3Score": 5.5
+      },
+      "nvd": {
+       "V2Vector": "AV:L/AC:M/Au:N/C:P/I:N/A:N",
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+       "V2Score": 1.9,
+       "V3Score": 5.5
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:N/A:N",
+       "V3Score": 5.5
+      }
+     },
+     "PublishedDate": "2022-02-21T19:15:08.393Z"
+    }
+   ]
+  },
+  {
+   "Target": "Python",
+   "Class": "lang-pkgs",
+   "Type": "python-pkg",
+   "Vulnerabilities": [
+    {
+     "VulnerabilityID": "CVE-2026-23949",
+     "PkgName": "jaraco.context",
+     "InstalledVersion": "5.3.0",
+     "FixedVersion": "6.1.0",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-23949",
+     "Title": "jaraco.context: jaraco.context: Path traversal via malicious tar archives",
+     "Severity": "HIGH",
+     "CVSS": {
+      "ghsa": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N",
+       "V3Score": 8.6
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N",
+       "V3Score": 8.6
+      }
+     },
+     "PublishedDate": "2026-01-20T01:15:57.723Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-24049",
+     "PkgName": "wheel",
+     "InstalledVersion": "0.45.1",
+     "FixedVersion": "0.46.2",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-24049",
+     "Title": "wheel: wheel: Privilege Escalation or Arbitrary Code Execution via malicious wheel file unpacking",
+     "Severity": "HIGH",
+     "CVSS": {
+      "ghsa": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:H",
+       "V3Score": 7.1
+      },
+      "nvd": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N",
+       "V3Score": 5.5
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:H",
+       "V3Score": 7.1
+      }
+     },
+     "PublishedDate": "2026-01-22T05:16:23.157Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2023-5752",
+     "PkgName": "pip",
+     "InstalledVersion": "23.0.1",
+     "FixedVersion": "23.3",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2023-5752",
+     "Title": "pip: Mercurial configuration injectable in repo revision when installing via pip",
+     "Severity": "MEDIUM",
+     "CVSS": {
+      "ghsa": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N",
+       "V40Vector": "CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N",
+       "V3Score": 5.5,
+       "V40Score": 6.8
+      },
+      "nvd": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N",
+       "V3Score": 3.3
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N",
+       "V3Score": 3.3
+      }
+     },
+     "PublishedDate": "2023-10-25T18:17:44.867Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2025-8869",
+     "PkgName": "pip",
+     "InstalledVersion": "23.0.1",
+     "FixedVersion": "25.3",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2025-8869",
+     "Title": "pip: pip missing checks on symbolic link extraction",
+     "Severity": "MEDIUM",
+     "CVSS": {
+      "ghsa": {
+       "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:A/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N",
+       "V40Score": 5.9
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:H/A:N",
+       "V3Score": 5.3
+      }
+     },
+     "PublishedDate": "2025-09-24T15:15:41.293Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-13346",
+     "PkgName": "pip",
+     "InstalledVersion": "23.0.1",
+     "FixedVersion": "26.2.0",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-13346",
+     "Title": "pip: pip: Arbitrary file installation via malicious package indexes",
+     "Severity": "MEDIUM",
+     "CVSS": {
+      "ghsa": {
+       "V40Vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:H/UI:A/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N",
+       "V40Score": 5.6
+      },
+      "nvd": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N",
+       "V3Score": 6.5
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:U/C:L/I:H/A:L",
+       "V3Score": 5.9
+      }
+     },
+     "PublishedDate": "2026-07-29T19:16:44.267Z"
+    },
+    {
+     "VulnerabilityID": "CVE-2026-1703",
+     "PkgName": "pip",
+     "InstalledVersion": "23.0.1",
+     "FixedVersion": "26.0",
+     "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-1703",
+     "Title": "pip: pip: Information disclosure via path traversal when installing crafted wheel archives",
+     "Severity": "LOW",
+     "CVSS": {
+      "ghsa": {
+       "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:A/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N",
+       "V40Score": 2
+      },
+      "redhat": {
+       "V3Vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:N",
+       "V3Score": 3.9
+      }
+     },
+     "PublishedDate": "2026-02-02T15:16:30.51Z"
+    }
+   ]
+  }
+ ]
+}

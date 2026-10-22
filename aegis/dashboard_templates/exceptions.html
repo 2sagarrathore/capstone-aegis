@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Aegis — exceptions{% endblock %}
+{% block body %}
+<h2 style="margin-top:4px">Approved exceptions <span class="muted">· {{ path }}</span></h2>
+{% if error %}<div class="panel" style="color:var(--fail)">{{ error }}</div>{% endif %}
+<p class="muted">Every exception is time-boxed. Expired entries stop suppressing findings immediately —
+  prune them with <code>aegis exceptions prune</code>.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>CVE</th><th>Package</th><th>Image</th><th>Expires</th>
+    <th class="num">Days left</th><th class="hide-sm">Approved by</th><th class="hide-sm">Reason</th></tr></thead>
+  <tbody>
+  {% for entry in entries %}
+    <tr>
+      <td><code>{{ entry.vuln_id }}</code></td>
+      <td><code>{{ entry.package }}</code></td>
+      <td><code>{{ entry.image }}</code></td>
+      <td>{{ entry.expires }}</td>
+      <td class="num">
+        {% if entry.days < 0 %}<span class="sev CRITICAL">expired</span>
+        {% elif entry.days <= warn_days %}<span class="sev HIGH">{{ entry.days }}</span>
+        {% else %}{{ entry.days }}{% endif %}
+      </td>
+      <td class="hide-sm muted">{{ entry.approved_by or '—' }}</td>
+      <td class="hide-sm muted">{{ entry.reason[:70] }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" class="muted">No exceptions defined.</td></tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}
