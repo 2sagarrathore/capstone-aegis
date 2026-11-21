@@ -7,8 +7,19 @@ on:
   push:
     branches: [main]
   pull_request:
-  schedule:
-    - cron: "0 3 * * *"   # nightly rescan: the CVE database moves even when the image does not
+  # Nightly rescan. An image that passed yesterday is not necessarily clean today:
+  # the image has not changed, but the CVE database has. This is the trigger a
+  # production deployment of this tool runs on, paired with `aegis rescan
+  # --stale-hours 20` (see docs/USAGE.md and ci/gitlab-ci.yml, where the
+  # equivalent scheduled job is wired up).
+  #
+  # It is commented out in this repository only: this is a coursework repo that
+  # nobody is actively maintaining, and a nightly job running forever against an
+  # unattended account is waste, not diligence. Uncomment the two lines below to
+  # turn it back on.
+  #
+  # schedule:
+  #   - cron: "0 3 * * *"
   workflow_dispatch:
     inputs:
       image:

@@ -62,7 +62,7 @@ image. `--warn-only` and `--exit-zero` allow a staged rollout.
 | Structured reports (PDF/HTML/JSON) | JSON, self-contained HTML (offline, filterable) and Markdown |
 | Slack / Teams integration | `notify/slack.py` (Block Kit), `notify/teams.py` (MessageCard), both with retry |
 | Severity-based alert customization | `min_severity` per channel; failures always notify |
-| Daily/weekly summary alerts | `aegis rescan` on a cron with notifications enabled |
+| Daily/weekly summary alerts | `aegis rescan` on a cron, with notifications enabled (*partial*: alerts are per-image, not a single cross-image digest) |
 
 **Beyond the brief:** notifications fire on *newly introduced* findings, not on
 every scan — a channel that reports the same 977 findings nightly gets muted
@@ -99,10 +99,10 @@ provisioned in `deploy/grafana/`.
 
 | Task | Delivered |
 |---|---|
-| Comprehensive documentation | README + 6 documents (~950 lines): setup, usage, architecture, troubleshooting, cost, this mapping |
+| Comprehensive documentation | README + 6 documents (~1,400 lines): setup, usage, architecture, troubleshooting, cost, this mapping |
 | Deployment script | `deploy/install.sh`, multi-stage `Dockerfile`, `docker-compose.yml`, `Makefile` |
-| Testing across CI systems | Three pipelines; 114 tests that run offline with no Trivy binary |
-| Feedback and adjustment | Three real bugs found by the tests, fixed, and covered by regression tests (below) |
+| Testing across CI systems | Three pipelines; 115 tests that run offline with no Trivy binary |
+| Feedback and adjustment | Six real bugs found and fixed with regression tests (below). *No external beta users were available*, so the feedback loop was the test suite and running the real stack |
 
 ## Deliverables checklist
 
@@ -217,5 +217,11 @@ correct behaviour, and a reminder that a security tool is also supply chain.
   end-of-life distributions because the vendor stops publishing data. An
   `"EOSL": true` is a worse signal than a list of CVEs; this is called out in
   TROUBLESHOOTING. Detecting and failing on EOSL is the obvious next feature.
+* **This repository's own nightly schedule is switched off.** The scheduled
+  rescan is a real feature and is wired up in `ci/gitlab-ci.yml` and documented in
+  `docs/SETUP.md`; in `.github/workflows/image-scan.yml` the `schedule:` trigger is
+  commented out, with the reason beside it. A coursework repository that nobody is
+  maintaining should not run a job against an unattended account every night
+  forever. Uncommenting two lines restores it.
 * **No SBOM output.** CycloneDX/SPDX export is a natural next step — Trivy can
   already produce it; Aegis does not yet surface it.
