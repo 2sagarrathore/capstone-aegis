@@ -219,6 +219,8 @@ def _apply_env_overrides(config: AegisConfig) -> None:
         config.policy.fail_on = value.upper()
     if (value := _env_bool("AEGIS_WARN_ONLY")) is not None:
         config.policy.warn_only = value
+    if (value := _env_bool("AEGIS_FIXABLE_ONLY")) is not None:
+        config.policy.fail_on_fixable_only = value
     for severity in ("CRITICAL", "HIGH", "MEDIUM", "LOW", "UNKNOWN"):
         value_int = _env_int(f"AEGIS_MAX_{severity}")
         if value_int is not None:

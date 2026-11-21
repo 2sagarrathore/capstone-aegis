@@ -178,6 +178,7 @@ Precedence: **CLI flag > environment variable > `aegis.yml` > default**.
 | `AEGIS_FAIL_ON` | `policy.fail_on` |
 | `AEGIS_MAX_CRITICAL`, `AEGIS_MAX_HIGH`, `AEGIS_MAX_MEDIUM`, `AEGIS_MAX_LOW` | `policy.max_allowed.<SEVERITY>` |
 | `AEGIS_WARN_ONLY` | `policy.warn_only` |
+| `AEGIS_FIXABLE_ONLY` | `policy.fail_on_fixable_only` |
 | `AEGIS_IGNORE_UNFIXED`, `AEGIS_OFFLINE`, `AEGIS_SKIP_DB_UPDATE` | scanner behaviour |
 | `AEGIS_CACHE_DIR`, `AEGIS_TIMEOUT_SECONDS`, `AEGIS_RETRIES` | scanner tuning |
 | `AEGIS_OUTPUT_DIR`, `AEGIS_FORMATS` | reporting |

@@ -78,3 +78,9 @@ def test_missing_explicit_config_raises(tmp_path):
         assert "not found" in str(exc)
     else:  # pragma: no cover
         raise AssertionError("expected FileNotFoundError")
+
+
+def test_fixable_only_env_override(tmp_path, monkeypatch):
+    path = write(tmp_path, {"policy": {"fail_on_fixable_only": False}})
+    monkeypatch.setenv("AEGIS_FIXABLE_ONLY", "true")
+    assert load_config(str(path)).policy.fail_on_fixable_only is True
