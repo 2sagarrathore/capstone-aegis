@@ -18,6 +18,7 @@ on:
 permissions:
   contents: read
   pull-requests: write      # needed only by the PR-comment step
+  packages: write           # needed only by the opt-in registry push below
 
 env:
   IMAGE: ${{ github.event.inputs.image || format('ghcr.io/{0}:{1}', github.repository, github.sha) }}
@@ -115,8 +116,14 @@ jobs:
           echo "::error::Aegis gate failed (exit ${{ steps.scan.outputs.exit_code }}) — see the job summary."
           exit 1
 
+      # Publishing is opt-in: set the repository variable PUBLISH_IMAGE=true
+      # (`gh variable set PUBLISH_IMAGE --body true`) to enable it. A capstone or
+      # template repository should not start pushing images to someone's registry
+      # the first time it is cloned and run. The ordering is the point either way:
+      # this step sits *after* the gate, so an image that fails can never reach a
+      # registry.
       - name: Push image
-        if: success() && github.ref == 'refs/heads/main' && github.event.inputs.image == ''
+        if: success() && vars.PUBLISH_IMAGE == 'true' && github.ref == 'refs/heads/main' && github.event.inputs.image == ''
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker push "$IMAGE"
